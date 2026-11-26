@@ -1,0 +1,26 @@
+{
+  "name": "profile-signals",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Chrome extension that rates a LinkedIn member profile green, yellow or red with your own rules, locally.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test 'test/*.test.ts'",
+    "test:e2e": "playwright test --project=e2e",
+    "test:visual": "playwright test --project=visual",
+    "test:visual:update": "playwright test --project=visual --update-snapshots",
+    "lint": "node scripts/lint.ts",
+    "typecheck": "tsc",
+    "package": "node scripts/package.ts",
+    "start": "node scripts/playground.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}
