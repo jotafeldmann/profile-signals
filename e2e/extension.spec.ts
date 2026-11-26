@@ -1,7 +1,14 @@
 // The installed extension, end to end, on synthetic profile pages. Run with: make test-e2e
-import {automatic, configure, counts, dot, expect, openProfile, panel, test} from './fixtures.ts';
+import {automatic, configure, counts, dot, expect, manual, openProfile, panel, test} from './fixtures.ts';
 
-test('by default nothing is opened, and Collect now gives the verdict', async ({page}) => {
+test('by default, opening a profile collects it', async ({page}) => {
+  await openProfile(page, 'ada-example');
+  await expect(dot(page)).toHaveAttribute('aria-label', /Green/, {timeout: 10_000});
+  expect((await counts(page)).aboutOpened).toBe(1);
+});
+
+test('with automatic collection off, nothing is opened, and Collect now gives the verdict', async ({page, worker}) => {
+  await configure(worker, manual);
   await openProfile(page, 'ada-example');
   await expect(dot(page)).toHaveAttribute('aria-label', /Not collected yet/);
   await page.waitForTimeout(1500);
@@ -15,7 +22,8 @@ test('by default nothing is opened, and Collect now gives the verdict', async ({
   await expect(page.locator('#about')).not.toHaveAttribute('open');
 });
 
-test('in manual mode, opening About this member yourself is read', async ({page}) => {
+test('in manual mode, opening About this member yourself is read', async ({page, worker}) => {
+  await configure(worker, manual);
   await openProfile(page, 'mid-example');
   await page.waitForFunction(() => (window as unknown as {__fixture: {hydrated: boolean}}).__fixture.hydrated);
   await page.locator('#more').click();
@@ -83,11 +91,11 @@ test('the dot floats left of the name without moving it', async ({page}) => {
 test('the settings tab saves the collection switch and refuses bad thresholds', async ({page, worker, extensionId}) => {
   await page.goto(`chrome-extension://${extensionId}/options.html`);
   await expect(page.locator('#status')).toHaveText('Using the defaults from rules.json.');
-  await expect(page.locator('#automatic')).not.toBeChecked();
-  await page.locator('#automatic').check();
+  await expect(page.locator('#automatic')).toBeChecked();
+  await page.locator('#automatic').uncheck();
   await page.getByRole('button', {name: 'Save'}).click();
   await expect(page.locator('#status')).toHaveText('Saved. Open LinkedIn tabs use it now.');
-  expect(await worker.evaluate(async () => (await chrome.storage.local.get('config')).config.collection.automatic)).toBe(true);
+  expect(await worker.evaluate(async () => (await chrome.storage.local.get('config')).config.collection.automatic)).toBe(false);
 
   await page.locator('#yellowAt').fill('90');
   await page.getByRole('button', {name: 'Save'}).click();

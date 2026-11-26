@@ -54,7 +54,7 @@ function render() {
   config.verdict ??= {}; config.cache ??= {}; config.collection ??= {};
   $('#greenAt').value = Math.round((config.verdict.greenAtLeast ?? 0.8) * 100);
   $('#yellowAt').value = Math.round((config.verdict.yellowAtLeast ?? 0.5) * 100);
-  $('#automatic').checked = config.collection.automatic === true;
+  $('#automatic').checked = config.collection.automatic !== false;
   $('#cacheOn').checked = config.cache.enabled !== false;
   $('#cacheDays').value = config.cache.days ?? 90;
   $('#rules').replaceChildren(...config.rules.map(ruleCard));

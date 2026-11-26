@@ -21,7 +21,7 @@ test('every file the manifest loads is shipped, and everything shipped exists', 
   assert.deepEqual([...present].sort(), [...SHIPPED].sort(), 'extension/ holds a file the package leaves out');
 });
 
-test('the default rules collect only when asked', () => {
+test('the default rules collect automatically', () => {
   const rules = JSON.parse(readFileSync(new URL('../extension/rules.json', import.meta.url), 'utf8'));
-  assert.equal(rules.collection.automatic, false);
+  assert.equal(rules.collection.automatic, true);
 });

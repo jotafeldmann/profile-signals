@@ -26,8 +26,8 @@ make install
 make start
 ```
 
-`make start` opens Chromium with the extension loaded on a synthetic profile. Click the grey dot left of the
-name, then **Collect now**. Other synthetic profiles: `make start PROFILE=new-account` (red),
+`make start` opens Chromium with the extension loaded on a synthetic profile. The dot left of the name
+collects by itself and turns green; click it to see why. Other synthetic profiles: `make start PROFILE=new-account` (red),
 `PROFILE=mid-example` (yellow), `PROFILE=slow-start` (a page that ignores the first clicks).
 
 To try it on the real LinkedIn, load the `extension/` folder in Chrome: `chrome://extensions`, **Developer

@@ -6,12 +6,13 @@ ADR with status `rejected` and its reason.
 | ADR | Status | Title | Date |
 | --- | ------ | ----- | ---- |
 | [ADR-001](ADR-001-plain-javascript-extension.md) | accepted | the extension is plain JavaScript with no build step | 2026-11-26 |
-| [ADR-002](ADR-002-manual-collection-by-default.md) | accepted | collection is manual by default; automatic is an opt-in setting | 2026-11-26 |
+| [ADR-002](ADR-002-manual-collection-by-default.md) | superseded | collection is manual by default; automatic is an opt-in setting | 2026-11-26 |
 | [ADR-003](ADR-003-name-profile-signals.md) | accepted | the project is named Profile Signals, not j-linkedin | 2026-11-26 |
 | [ADR-004](ADR-004-account-age-rule.md) | accepted | account age is the hard gate, with the generative-AI era as the red line | 2026-11-26 |
 | [ADR-005](ADR-005-rules-through-the-worker-and-local-cache.md) | accepted | rules reach the page through the background worker; results are cached locally per profile URL | 2026-11-26 |
 | [ADR-006](ADR-006-tests-never-reach-linkedin.md) | accepted | browser tests run on synthetic pages; nothing reaches LinkedIn | 2026-11-26 |
 | [ADR-007](ADR-007-visual-tests-in-playwright-docker-image.md) | accepted | visual tests run in Playwright's Docker image, locally and in CI | 2026-11-26 |
 | [ADR-008](ADR-008-public-repository-and-releases.md) | accepted | public repository under MIT; releases are GitHub releases built from tags | 2026-11-26 |
+| [ADR-009](ADR-009-automatic-collection-by-default.md) | accepted | collection is automatic by default; manual is a setting | 2026-11-26 |
 
-By status: 8 accepted.
+By status: 8 accepted, 1 superseded.

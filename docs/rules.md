@@ -38,10 +38,10 @@ Fields: `created`, `connections`, `followers`, `mutual`, `degree`, `photo`, `con
 
 ## Collection
 
-- `collection.automatic: false` (default): nothing is opened by itself. The dot stays grey until you click
-  **Collect now** or open **More → About this member** yourself.
-- `collection.automatic: true`: the extension opens that panel on every profile you visit, reads it and
-  closes it, in about 3 seconds. Read [privacy and limits](privacy.md) first.
+- `collection.automatic: true` (default): the extension opens **More → About this member** on every profile
+  you visit, reads it and closes it, in about 3 seconds. Read [privacy and limits](privacy.md).
+- `collection.automatic: false`: nothing is opened by itself. The dot stays grey until you click
+  **Collect now** or open that panel yourself.
 
 ## Cache
 

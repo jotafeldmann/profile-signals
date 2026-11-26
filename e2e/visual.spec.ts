@@ -1,6 +1,6 @@
 // Screenshots compared with stored baselines. Fonts differ between machines, so these run only inside
 // Playwright's Docker image, locally (make test-visual) and in CI alike. See ADR-007.
-import {automatic, configure, dot, expect, openProfile, panel, test} from './fixtures.ts';
+import {automatic, configure, dot, expect, manual, openProfile, panel, test} from './fixtures.ts';
 
 test('panel with a green verdict', async ({page, worker}) => {
   await configure(worker, automatic);
@@ -12,7 +12,8 @@ test('panel with a green verdict', async ({page, worker}) => {
   await expect(panel(page)).toHaveScreenshot('panel-green.png', {mask: [age]});
 });
 
-test('panel before anything is collected', async ({page}) => {
+test('panel before anything is collected', async ({page, worker}) => {
+  await configure(worker, manual);
   await openProfile(page, 'new-account');
   await dot(page).click();
   await expect(panel(page)).toHaveScreenshot('panel-idle.png');

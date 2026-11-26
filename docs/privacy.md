@@ -17,11 +17,11 @@ LinkedIn shows you on the page. There is no server, account, analytics or AI.
 LinkedIn's User Agreement does not allow software, including browser extensions, that scrapes or copies
 profiles. This extension only reads the page you are looking at, for you, and keeps it on your machine. Still:
 
-- **By default it opens nothing by itself** (ADR-002). Collecting is a click of yours, or the About panel you
-  opened yourself.
-- **Automatic collection** (off by default) opens LinkedIn's About panel on every profile you visit. That is
-  automated use of LinkedIn's pages. Turn it on only after reading LinkedIn's terms and your company's
-  policies; the risk to your account is yours.
+- **By default it collects automatically** (ADR-009): it opens LinkedIn's About panel on every profile you
+  visit. That is automated use of LinkedIn's pages. Read LinkedIn's terms and your company's policies; the
+  risk to your account is yours.
+- **Turn automatic collection off** in Settings and it opens nothing by itself: collecting is then a click of
+  yours, or the About panel you opened yourself.
 
 ## What the colors mean
 

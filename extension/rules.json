@@ -1,8 +1,8 @@
 {
   "_readme": "Scoring rules for Profile Signals. The order of the rules is their priority: they are shown and checked in this order. weight: how much a rule counts in the score. hardGate: true lets the rule alone cap the result: red makes the profile red, yellow caps it at yellow, and an unchecked gate caps it at yellow. enabled: false switches a rule off. Easiest: edit these values in the extension settings tab (right-click the toolbar icon, Options). Saved settings override this file; Reset to defaults there returns to it. After editing this file, reload the extension in chrome://extensions and then the LinkedIn page.",
   "collection": {
-    "_comment": "automatic: false (the default) opens nothing by itself: the dot stays grey until you click Collect now in the panel, or open More, About this member yourself. automatic: true opens that panel on every profile you visit, which is faster but is automated use of LinkedIn's pages; check LinkedIn's terms first.",
-    "automatic": false
+    "_comment": "automatic: true (the default) opens More, About this member on every profile you visit, reads it and closes it. That is automated use of LinkedIn's pages; check LinkedIn's terms. automatic: false opens nothing by itself: the dot stays grey until you click Collect now in the panel, or open the About panel yourself.",
+    "automatic": true
   },
   "cache": {
     "_comment": "Collected profiles are kept in this Chrome profile (chrome.storage.local), keyed by the profile URL, so a profile is not collected again until the entry is older than days. Refresh in the panel always collects again. enabled: false turns the cache off.",

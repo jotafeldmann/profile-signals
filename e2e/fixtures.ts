@@ -44,6 +44,7 @@ export async function configure(worker: Worker, patch: Record<string, unknown>):
 }
 
 export const automatic = {collection: {automatic: true}};
+export const manual = {collection: {automatic: false}};
 
 /** The status dot and the panel, inside the extension's shadow root (Playwright locators pierce it). */
 export const dot = (page: Page) => page.locator('#profile-signals-host button.dot');

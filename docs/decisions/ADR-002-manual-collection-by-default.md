@@ -1,7 +1,7 @@
 # ADR-002: collection is manual by default; automatic is an opt-in setting
 
 **Date:** 2026-11-26
-**Status:** accepted.
+**Status:** superseded by ADR-009.
 **Context:** Until 0.2.0 the extension opened LinkedIn's **More → About this member** panel by itself on every profile. LinkedIn's User Agreement does not allow software that scrapes or copies profiles, and a public repository under the author's name makes that behaviour visible. J chose to make it optional.
 
 ## Decision

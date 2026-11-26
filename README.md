@@ -24,12 +24,12 @@ LinkedIn.
 
 ## Use
 
-- On a profile (`https://www.linkedin.com/in/...`) a dot floats to the left of the name. Grey means not
-  collected yet.
-- Click it and choose **Collect now**, or open **More → About this member** yourself: the dot turns
-  **green**, **yellow** or **red**, and the panel says why, rule by rule.
+- On a profile (`https://www.linkedin.com/in/...`) a dot floats to the left of the name. The extension opens
+  **More → About this member** by itself, reads it and closes it: the dot turns **green**, **yellow** or
+  **red**, and clicking it shows why, rule by rule.
 - **Settings** in the panel changes the rules, their weights and hard gates, the cache, and whether to
-  collect automatically on every profile (off by default: see [privacy and limits](docs/privacy.md)).
+  collect automatically (on by default: see [privacy and limits](docs/privacy.md)). Turned off, the dot stays
+  grey until you click it and choose **Collect now**, or open the About panel yourself.
 - A small ring on the dot means the result came from the cache; **Refresh now** collects again.
 
 ## Develop

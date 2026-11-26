@@ -1,4 +1,4 @@
-// Runs on LinkedIn: finds the profile, collects (on request, or automatically when enabled), caches and draws the dot.
+// Runs on LinkedIn: finds the profile, collects (automatically, or only on request when turned off), caches and draws the dot.
 (() => {
   const UI = globalThis.ProfileSignalsUI, V = globalThis.ProfileSignalsVerdict, X = globalThis.ProfileSignalsExtract;
   const {clean, heading, extractNetwork, dialogs, aboutDialog, extractAbout, findMenu, findItem} = X;
@@ -9,8 +9,8 @@
   async function until(f, max, ok) { for (let t = 0; t < max && ok(); t += 50) { const v = f(); if (v) return v; await wait(50); } return null; }
   const profile = () => /^\/in\/[^/]+\/?$/.test(location.pathname);
   const current = () => location.pathname.replace(/\/$/, '');
-  // Automatic collection opens LinkedIn's menus by itself on every profile. It is off by default (ADR-002).
-  const automatic = () => rules?.collection?.automatic === true;
+  // Automatic collection opens LinkedIn's menus by itself on every profile. It is on unless turned off (ADR-009).
+  const automatic = () => rules?.collection?.automatic !== false;
 
   // Long-lived cache per profile, keyed by the profile URL path (/in/<slug>), in chrome.storage.local.
   // A fresh entry is shown at once and LinkedIn is not touched; Refresh collects again and overwrites it.
