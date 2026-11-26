@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Profile Signals settings</title>
+<style>
+  :root{--bg:#f4f5f6;--card:#fff;--text:#202124;--muted:#5f6368;--line:#dadce0;--accent:#0a66c2;--green:#18864b;--yellow:#e1ab00;--red:#c83232}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  main{max-width:760px;margin:0 auto;padding:32px 16px 64px}
+  h1{font-size:24px;margin:0 0 4px} h2{font-size:16px;margin:0 0 4px}
+  .lead,.help{color:var(--muted);margin:0 0 12px} .help{font-size:12px;margin:6px 0 0}
+  section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin:16px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:12px}
+  label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+  label.check{flex-direction:row;align-items:center;gap:8px;color:var(--text);font-size:14px}
+  input[type=number],input[type=text],select,textarea{font:inherit;color:inherit;background:#fff;border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+  textarea{width:100%;min-height:260px;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace}
+  .rule{border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:12px}
+  .rule.off{opacity:.55}
+  .head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .head strong{flex:1;min-width:140px}
+  .tag{font-size:11px;border-radius:4px;padding:1px 6px;border:1px solid var(--line);color:var(--muted)}
+  .order{display:flex;gap:4px}
+  button{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:6px;padding:6px 12px}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button:disabled{opacity:.4;cursor:default}
+  .bar{position:sticky;bottom:0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);padding:12px 0;border-top:1px solid var(--line)}
+  #status{color:var(--muted)} #status.error{color:var(--red)} #status.ok{color:var(--green)}
+  .scale{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+</style>
+</head>
+<body>
+<main>
+  <h1>Profile Signals settings</h1>
+  <p class="lead">These rules decide the color of the dot next to a LinkedIn profile name. Saving applies them at once to open LinkedIn tabs. The defaults come from <code>rules.json</code>.</p>
+
+  <section>
+    <h2>Verdict</h2>
+    <p class="help">Each rule gives green (1 point), yellow (0.5) or red (0). The score is the weighted average of the rules that could be checked. A hard gate overrides the score: a red gate makes the profile red, a yellow gate caps it at yellow, an unchecked gate caps it at yellow.</p>
+    <div class="grid">
+      <label>Green from score (%)<input id="greenAt" type="number" min="0" max="100" step="1"></label>
+      <label>Yellow from score (%)<input id="yellowAt" type="number" min="0" max="100" step="1"></label>
+    </div>
+    <div class="scale"><span class="dot" style="background:var(--red)"></span>below yellow <span class="dot" style="background:var(--yellow)"></span>yellow <span class="dot" style="background:var(--green)"></span>green</div>
+  </section>
+
+  <section>
+    <h2>Collection</h2>
+    <p class="help">By default nothing is opened by itself: the dot stays grey until you click <b>Collect now</b> in the panel, or open <b>More → About this member</b> yourself. Automatic collection opens that panel on every profile you visit. It is faster, but it is automated use of LinkedIn's pages: check LinkedIn's terms before turning it on.</p>
+    <div class="grid">
+      <label class="check" style="grid-column:1/-1"><input id="automatic" type="checkbox"> Collect automatically on every profile</label>
+    </div>
+  </section>
+
+  <section>
+    <h2>Rules</h2>
+    <p class="help">The order is the priority: rules are shown and checked from top to bottom. Weight is how much a rule counts in the score.</p>
+    <div id="rules"></div>
+  </section>
+
+  <section>
+    <h2>Cache</h2>
+    <p class="help">Collected profiles are kept in this Chrome profile only, keyed by the profile URL, so the extension does not open LinkedIn's menus again for a profile it already read. A cached result shows a small ring on the dot; Refresh in the panel always collects again.</p>
+    <div class="grid">
+      <label class="check"><input id="cacheOn" type="checkbox"> Use the cache</label>
+      <label>Keep entries for (days)<input id="cacheDays" type="number" min="1" step="1"></label>
+    </div>
+    <p class="help"><span id="cacheCount">…</span> <button id="clearCache" type="button">Clear cache</button></p>
+  </section>
+
+  <section>
+    <h2>Advanced: edit as JSON</h2>
+    <p class="help">The same settings as text, in the format of <code>rules.json</code>. Apply puts the text into the form above; Save stores it.</p>
+    <textarea id="json" spellcheck="false" aria-label="Settings as JSON"></textarea>
+    <p><button id="applyJson" type="button">Apply JSON to the form</button></p>
+  </section>
+
+  <div class="bar">
+    <button id="save" class="primary" type="button">Save</button>
+    <button id="reset" type="button">Reset to defaults</button>
+    <span id="status" role="status"></span>
+  </div>
+  <p class="help">Made by <a href="https://github.com/jotafeldmann" target="_blank" rel="noopener noreferrer">github.com/jotafeldmann</a></p>
+</main>
+<script src="options.js"></script>
+</body>
+</html>

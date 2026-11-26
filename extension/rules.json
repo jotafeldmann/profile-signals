@@ -1,0 +1,51 @@
+{
+  "_readme": "Scoring rules for Profile Signals. The order of the rules is their priority: they are shown and checked in this order. weight: how much a rule counts in the score. hardGate: true lets the rule alone cap the result: red makes the profile red, yellow caps it at yellow, and an unchecked gate caps it at yellow. enabled: false switches a rule off. Easiest: edit these values in the extension settings tab (right-click the toolbar icon, Options). Saved settings override this file; Reset to defaults there returns to it. After editing this file, reload the extension in chrome://extensions and then the LinkedIn page.",
+  "collection": {
+    "_comment": "automatic: false (the default) opens nothing by itself: the dot stays grey until you click Collect now in the panel, or open More, About this member yourself. automatic: true opens that panel on every profile you visit, which is faster but is automated use of LinkedIn's pages; check LinkedIn's terms first.",
+    "automatic": false
+  },
+  "cache": {
+    "_comment": "Collected profiles are kept in this Chrome profile (chrome.storage.local), keyed by the profile URL, so a profile is not collected again until the entry is older than days. Refresh in the panel always collects again. enabled: false turns the cache off.",
+    "enabled": true,
+    "days": 90
+  },
+  "verdict": {
+    "_comment": "Weighted score: green counts 1, yellow 0.5, red 0. Fields LinkedIn did not show are left out of the score. The score sets the color unless a hard gate caps it.",
+    "greenAtLeast": 0.8,
+    "yellowAtLeast": 0.5
+  },
+  "rules": [
+    {
+      "id": "account-created",
+      "label": "Account created",
+      "field": "created",
+      "type": "year",
+      "weight": 5,
+      "hardGate": true,
+      "greenBefore": 2016,
+      "redAfter": 2022,
+      "_comment": "Green if created before 2016, yellow from 2016 to 2022, red if created after 2022. Late 2022 starts the generative-AI era (ChatGPT launched in November 2022): realistic photos, CVs and posts became cheap, and fake profiles became easy to produce at scale."
+    },
+    {
+      "id": "verification",
+      "label": "Verifications",
+      "field": "verification",
+      "type": "present",
+      "weight": 3,
+      "hardGate": false,
+      "ifMissing": "yellow",
+      "_comment": "Green if LinkedIn shows any verification (identity, workplace, education). None is yellow, never red: many genuine members never verify."
+    },
+    {
+      "id": "connections",
+      "label": "Connections",
+      "field": "connections",
+      "type": "number",
+      "weight": 2,
+      "hardGate": false,
+      "greenAtLeast": 100,
+      "redBelow": 20,
+      "_comment": "500+ counts as 500. Creator profiles may show only followers; then this rule is left out of the score."
+    }
+  ]
+}
