@@ -95,6 +95,13 @@ typecheck: ## Type check the tests and scripts
 
 ci: lint typecheck test test-e2e test-visual ## Everything that must be green before committing
 
+##@ Docs
+.PHONY: screenshots
+#> Takes docs/images/*.png, the README previews, from the synthetic profiles: nothing reaches LinkedIn
+#> and no real person appears. Run it after a visual change and look at the images before committing.
+screenshots: ## Regenerate the README preview images
+	$(NODE) node scripts/screenshots.ts
+
 ##@ Release
 .PHONY: package
 #> Builds dist/profile-signals-<version>.zip with only the files Chrome loads. CI attaches it to the

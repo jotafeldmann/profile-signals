@@ -2,14 +2,24 @@
 
 [![ci](https://github.com/jotafeldmann/profile-signals/actions/workflows/ci.yml/badge.svg)](https://github.com/jotafeldmann/profile-signals/actions/workflows/ci.yml)
 
-Made by [jotafeldmann](https://github.com/jotafeldmann). Not affiliated with LinkedIn.
-
 A Chrome extension that reads what LinkedIn already shows about a member profile (account creation date,
 verifications, connections) and rates it green, yellow or red with rules you set. No account, no AI, no
 server: everything runs and stays in your browser.
 
 **The colors are signals to look closer, not proof.** A new account does not make a profile fake, and a
 green one may still be fake. Do not use them alone for hiring or any other decision about a person.
+
+## Preview
+
+<p>
+  <img src="docs/images/preview-green.png" width="270" alt="A green dot next to a profile name, with the panel open: every rule passes">
+  <img src="docs/images/preview-yellow.png" width="270" alt="A yellow verdict: the account was created between 2016 and 2022">
+  <img src="docs/images/preview-red.png" width="270" alt="A red verdict: the account was created after 2022, with no verifications and few connections">
+</p>
+
+The profiles above are invented, as in the tests. The settings tab:
+
+<img src="docs/images/settings.png" width="600" alt="The settings tab: verdict thresholds, automatic collection, rules and cache">
 
 ## Install
 
@@ -57,3 +67,5 @@ tests never reach LinkedIn.
 - [HANDOFF.md](HANDOFF.md): what is left to do
 
 License: [MIT](LICENSE).
+
+Made by [jotafeldmann](https://github.com/jotafeldmann). Not affiliated with LinkedIn.

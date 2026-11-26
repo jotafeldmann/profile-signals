@@ -48,6 +48,8 @@ test-e2e` shows the browser.
 
 A visual change that is intended needs new baselines: `make test-visual-update`, then look at the images in
 `e2e/visual.spec.ts-snapshots/` before committing them.
+The README's preview images come from the same synthetic profiles: `make screenshots` retakes them in
+`docs/images/`.
 
 ## Releasing a version (step by step)
 
@@ -74,7 +76,8 @@ To see the package without releasing: `make package` writes it to `dist/`.
 | `test`               | `node --test 'test/*.test.ts'`                                                   |
 | `test-e2e`           | `playwright test --project=e2e`                                                  |
 | `test-visual`        | `docker run ... mcr.microsoft.com/playwright:<version> npm run test:visual`      |
-| `test-visual-update` | the same, with `--update-snapshots`                                              |
+| `test-visual-update` | the same, with `--update-snapshots=all`                                          |
 | `lint`               | `node scripts/lint.ts` (`node --check` on each script, JSON parse)               |
 | `typecheck`          | `tsc` (tests and scripts; the extension is plain JavaScript, ADR-001)            |
+| `screenshots`        | `node scripts/screenshots.ts`                                                    |
 | `package`            | `node scripts/package.ts`                                                        |
