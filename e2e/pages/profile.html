@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Synthetic profile</title>
+<!--
+  A synthetic stand-in for a LinkedIn member profile, served by the browser tests at
+  https://www.linkedin.com/in/<slug>/ through Playwright routing: no request reaches LinkedIn.
+  It copies only the structure the extension reads (see extension/extract.js): the name heading inside
+  a link, the network line of the top card, a "More actions" menu with "About this member", and a
+  dialog that opens empty and is filled half a second later. Every person here is invented.
+-->
+<style>
+  body{margin:0;font:14px/1.4 Arial,sans-serif;color:#191919;background:#f4f2ee}
+  header{position:fixed;top:0;left:0;right:0;height:52px;background:#fff;border-bottom:1px solid #ddd;display:flex;align-items:center;padding:0 24px;z-index:10}
+  main{padding:96px 0 0 96px}
+  section{position:relative;background:#fff;border:1px solid #ddd;border-radius:8px;padding:24px;width:560px}
+  h2{font-size:24px;margin:0} a{color:inherit;text-decoration:none}
+  [role=menu]{position:absolute;left:24px;top:150px;background:#fff;border:1px solid #ccc;border-radius:6px;padding:4px 0;box-shadow:0 2px 8px #0003}
+  [role=menuitem]{padding:8px 16px;cursor:pointer}
+  dialog{width:420px;border:1px solid #ccc;border-radius:8px}
+  dialog p{margin:4px 0}
+</style>
+</head>
+<body>
+<header>Synthetic test page</header>
+<main>
+  <section id="card">
+    <a href="#"><h2 id="name"></h2></a>
+    <p id="headline"></p>
+    <p id="network"></p>
+    <button id="more" type="button" aria-label="More actions" aria-expanded="false">More</button>
+    <div id="menu" role="menu" hidden><div id="about-item" role="menuitem" tabindex="0">About this member</div></div>
+  </section>
+</main>
+<dialog id="about" aria-labelledby="about-title">
+  <h2 id="about-title">About this member</h2>
+  <div id="about-body"></div>
+  <button id="dismiss" type="button" aria-label="Dismiss">×</button>
+</dialog>
+<script>
+  const VERIFIED = ['Verifications', 'Identity', 'Verified by LinkedIn in April 2026', 'Learn more'];
+  const PROFILES = {
+    'ada-example': {name: 'Ada Example', headline: 'Engineer at Example Co.', network: '2nd · 500+ connections', about: ['Joined', 'May 2013', 'Profile photo updated', 'March 2024', ...VERIFIED]},
+    'mid-example': {name: 'Mid Example', headline: 'Analyst at Example Co.', network: '3rd · 500+ connections', about: ['Joined', 'March 2020', ...VERIFIED]},
+    'new-account': {name: 'Nova Account', headline: 'Recruiter', network: '3rd · 12 connections', about: ['Joined', 'February 2023', 'No verifications']},
+    // Ignores clicks for longer, like a slow LinkedIn start: the extension has to retry.
+    'slow-start': {name: 'Slow Start', headline: 'Designer', network: '2nd · 250 connections', hydrateMs: 1500, about: ['Joined', 'June 2011', ...VERIFIED]}
+  };
+  const p = PROFILES[location.pathname.split('/')[2]] || PROFILES['ada-example'];
+  const $ = id => document.getElementById(id);
+  document.title = `${p.name} | LinkedIn`;
+  $('name').textContent = p.name; $('headline').textContent = p.headline; $('network').textContent = p.network;
+
+  // What the tests read back: how many times the menu and the panel were opened, and when clicks start to count.
+  window.__fixture = {menuOpened: 0, aboutOpened: 0, hydrated: false};
+  setTimeout(() => { window.__fixture.hydrated = true; }, p.hydrateMs ?? 400);
+  const ready = () => window.__fixture.hydrated;
+  const setMenu = open => { $('menu').hidden = !open; $('more').setAttribute('aria-expanded', String(open)); };
+
+  $('more').onclick = () => { if (!ready()) return; window.__fixture.menuOpened++; setMenu($('menu').hidden); };
+  $('about-item').onclick = () => {
+    if (!ready()) return;
+    window.__fixture.aboutOpened++; setMenu(false);
+    $('about-body').replaceChildren(); $('about').showModal();
+    setTimeout(() => $('about-body').replaceChildren(...p.about.map(t => Object.assign(document.createElement('p'), {textContent: t}))), 500);
+  };
+  $('dismiss').onclick = () => $('about').close();
+</script>
+</body>
+</html>
