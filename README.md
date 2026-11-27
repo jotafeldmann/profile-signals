@@ -40,7 +40,7 @@ LinkedIn.
 - **Settings** in the panel changes the rules, their weights and hard gates, the cache, and whether to
   collect automatically (on by default: see [privacy and limits](docs/privacy.md)). Turned off, the dot stays
   grey until you click it and choose **Collect now**, or open the About panel yourself.
-- A small ring on the dot means the result came from the cache; **Refresh now** collects again.
+- 🕘 on the dot means the result came from the cache; **Refresh now** collects again.
 
 ## Develop
 
@@ -56,6 +56,22 @@ make ci
 
 `make` lists every command. `make start` opens Chromium with the extension on synthetic profiles; the
 tests never reach LinkedIn.
+
+## Configure
+
+Everything that decides the color is a setting: **Settings** in the panel, or right-click the toolbar icon,
+**Options**. Saved settings apply at once to open LinkedIn tabs, and **Reset to defaults** goes back to
+[`rules.json`](extension/rules.json).
+
+- **Hard gates:** turn any rule into a gate, or stop it being one. A red gate makes the profile red, a yellow
+  gate caps it at yellow. By default only **Account created** is a gate.
+- **Rules:** turn each one on or off, reorder them (the order is the priority), set its weight and its
+  limits (the years, the connection counts, the color when nothing is shown).
+- **Verdict:** the score from which a profile is green (80%) or yellow (50%).
+- **Collection:** automatic on every profile (default) or only when you click.
+- **Cache:** on or off, and how many days a result is kept (90).
+
+The rules and their defaults, with the reasons: [rules](docs/rules.md).
 
 ## Docs
 
