@@ -43,6 +43,19 @@ export async function configure(worker: Worker, patch: Record<string, unknown>):
   }, patch);
 }
 
+/**
+ * Answers the extension's update check with a fake GitHub release `tag`, forgets the last check and runs
+ * it again. Without this, the check is refused like every other request (ADR-006, ADR-010).
+ */
+export async function release(context: BrowserContext, worker: Worker, tag: string): Promise<void> {
+  await context.route('https://api.github.com/repos/*/*/releases/latest',
+    route => route.fulfill({contentType: 'application/json', body: JSON.stringify({tag_name: tag})}));
+  await worker.evaluate(async () => {
+    await chrome.storage.local.remove('update');
+    await (globalThis as unknown as {update: () => Promise<boolean>}).update();
+  });
+}
+
 export const automatic = {collection: {automatic: true}};
 export const manual = {collection: {automatic: false}};
 

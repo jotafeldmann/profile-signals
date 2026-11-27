@@ -29,6 +29,7 @@
   .progress{height:6px;background:#eceff1;border-radius:3px;overflow:hidden;margin:8px 0 4px}
   .progress span{display:block;height:100%;background:#0a66c2;transition:width .25s}
   .actions{display:flex;gap:6px;margin-top:8px}
+  .update{margin:-4px -4px 10px;padding:6px 8px;border-radius:6px;background:#fdecea;color:#202124;font-size:12px} .update a{color:#0a66c2;font-weight:600;text-decoration:none} .update a:hover{text-decoration:underline}
   .credit{margin:10px 0 0;font-size:11px;color:#80868b} .credit a{color:#0a66c2;text-decoration:none} .credit a:hover{text-decoration:underline}`;
   function el(tag,text,cls){const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e;}
   function mini(color){const m=el('span',null,'mini');m.style.setProperty('--c',COLORS[color]||COLORS.grey);return m;}
@@ -53,8 +54,10 @@
     c.style.setProperty('--c',p?COLORS.blue:COLORS[state?.verdict?.color]||COLORS.grey);if(p)c.style.setProperty('--p',String(percent(state)));
     b.append(c);if(state?.fromCache&&!p){const m=el('span','🕘','cachemark');m.setAttribute('aria-hidden','true');b.append(m);b.title='[cached] '+b.title;b.setAttribute('aria-label','Profile Signals: '+b.title);}return b;
   }
-  function render(state,{refresh,settings,close}={}){
-    const p=el('section',null,'panel');p.append(el('h2','Profile Signals'));
+  // The update line is the first thing in the panel, while a newer release exists (ADR-010).
+  function updateLine(url){const p=el('p',null,'update');const a=el('a','Update now ↗');a.href=url;a.target='_blank';a.rel='noopener noreferrer';p.append('There is an update for the extension · ',a);return p;}
+  function render(state,{refresh,settings,close,update}={}){
+    const p=el('section',null,'panel');if(update)p.append(updateLine(update));p.append(el('h2','Profile Signals'));
     const step=loading(state);const v=state?.verdict;
     if(step){const bar=el('div',null,'progress');const fill=el('span');fill.style.width=percent(state)+'%';bar.append(fill);p.append(bar);p.append(el('p',`Step ${step.step} of ${step.total}: ${step.label}…`));}
     else if(state?.status==='idle'){const line=el('div',null,'verdict');line.append(mini(null),el('span','Not collected yet'));p.append(line);}

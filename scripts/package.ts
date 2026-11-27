@@ -9,7 +9,7 @@ import {join, resolve} from 'node:path';
 /** What ships. A file in extension/ that is not listed here fails `make test`. */
 export const SHIPPED = [
   'manifest.json', 'background.js', 'content.js', 'extract.js', 'inspector.js', 'verdict.js',
-  'rules.json', 'popup.html', 'popup.js', 'options.html', 'options.js'
+  'rules.json', 'popup.html', 'popup.js', 'options.html', 'options.js', 'update.js'
 ];
 
 if (import.meta.main) {

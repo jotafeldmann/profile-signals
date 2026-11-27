@@ -11,7 +11,8 @@ Everything Chrome loads is in `extension/`, plain JavaScript with no build step 
 | `verdict.js`                | applies the rules to the collected fields: score, hard gates, color                        |
 | `content.js`                | decides when to collect, opens menus in automatic mode, caches, draws the dot             |
 | `inspector.js`              | draws the dot and the panel (shared by the page and the toolbar popup)                    |
-| `background.js`             | hands the rules to the page (saved settings, else `rules.json`) and opens the settings tab |
+| `background.js`             | hands the rules to the page (saved settings, else `rules.json`), opens the settings tab, sets the update badge |
+| `update.js`                 | whether a newer release exists on GitHub: asks at most once a day, never once one is known (ADR-010) |
 | `options.html`, `options.js` | the settings tab                                                                          |
 | `popup.html`, `popup.js`    | the toolbar popup: the same panel for the active tab                                      |
 | `rules.json`                | the default rules                                                                          |

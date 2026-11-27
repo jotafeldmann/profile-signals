@@ -2,7 +2,7 @@
 (() => {
   const UI = globalThis.ProfileSignalsUI, V = globalThis.ProfileSignalsVerdict, X = globalThis.ProfileSignalsExtract;
   const {clean, heading, extractNetwork, dialogs, aboutDialog, extractAbout, findMenu, findItem} = X;
-  let rules = null, rulesError = '', cacheChecked = false;
+  let rules = null, rulesError = '', cacheChecked = false, update = null;
   let route = '', state = {status: 'loading', data: {}}, host, shadow, opened = false, generation = 0, busy = false, lastAttempt = 0;
   const wait = ms => new Promise(r => setTimeout(r, ms));
   // Poll every 50 ms until f() returns something, the time runs out, or ok() turns false.
@@ -75,7 +75,8 @@
       f.append(UI.render(state, {
         refresh: () => collect(true),
         settings: () => chrome.runtime.sendMessage({type: 'profile-signals:options'}),
-        close: () => { opened = false; draw(); }
+        close: () => { opened = false; draw(); },
+        update
       }));
       shadow.append(f);
     }
@@ -162,6 +163,10 @@
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes.config) loadRules().then(() => { if (state.status === 'done') { judge(); draw(); } });
   });
+  // Whether a newer release exists: the background worker asks GitHub at most once a day (ADR-010).
+  chrome.runtime.sendMessage({type: 'profile-signals:update'})
+    .then(r => { update = r?.available ? r.url : null; if (update && opened) draw(); })
+    .catch(() => {});
   // Start only once the rules are known: the cache switch, its lifetime and the collection mode live there.
   loadRules().finally(() => { setInterval(tick, 250); tick(); });
 })();

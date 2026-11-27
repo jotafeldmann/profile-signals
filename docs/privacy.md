@@ -2,12 +2,18 @@
 
 ## What leaves your browser
 
-Nothing. The extension makes no network requests and uses no LinkedIn private API; it reads only what
-LinkedIn shows you on the page. There is no server, account, analytics or AI.
+Nothing from LinkedIn. The extension uses no LinkedIn private API and reads only what LinkedIn shows you on
+the page. There is no server, account, analytics or AI.
+
+Its one network request goes to GitHub, at most once a day, to learn whether a newer version exists
+(ADR-010): `api.github.com/repos/jotafeldmann/profile-signals/releases/latest`. It carries no profile data,
+but like any request it tells GitHub your IP address and that you use the extension. Once a newer version is
+known, it stops asking until you update.
 
 ## What is stored
 
 - Your settings, in `chrome.storage.local` of this Chrome profile.
+- The update check: the latest version GitHub gave and when it was asked.
 - The cache: for each collected profile, the name, the fields listed in the panel and the collection date,
   in the same place, until the entry expires (90 days by default) or you clear it in the settings tab.
   Removing the extension deletes all of it.

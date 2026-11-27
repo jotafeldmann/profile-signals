@@ -1,6 +1,6 @@
 // Screenshots compared with stored baselines. Fonts differ between machines, so these run only inside
 // Playwright's Docker image, locally (make test-visual) and in CI alike. See ADR-007.
-import {automatic, configure, dot, expect, manual, openProfile, panel, test} from './fixtures.ts';
+import {automatic, configure, dot, expect, manual, openProfile, panel, release, test} from './fixtures.ts';
 
 test('panel with a green verdict', async ({page, worker}) => {
   await configure(worker, automatic);
@@ -30,4 +30,12 @@ test('settings tab', async ({page, extensionId}) => {
   await page.goto(`chrome-extension://${extensionId}/options.html`);
   await expect(page.locator('#cacheCount')).toHaveText('0 profiles cached.');
   await expect(page).toHaveScreenshot('settings.png');
+});
+
+test('update line at the top of the panel', async ({page, context, worker}) => {
+  await release(context, worker, 'v99.0.0');
+  await configure(worker, manual);
+  await openProfile(page, 'new-account');
+  await dot(page).click();
+  await expect(panel(page).locator('.update')).toHaveScreenshot('panel-update.png');
 });

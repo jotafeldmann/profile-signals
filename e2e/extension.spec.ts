@@ -1,5 +1,5 @@
 // The installed extension, end to end, on synthetic profile pages. Run with: make test-e2e
-import {automatic, configure, counts, dot, expect, manual, openProfile, panel, test} from './fixtures.ts';
+import {automatic, configure, counts, dot, expect, manual, openProfile, panel, release, test} from './fixtures.ts';
 
 test('by default, opening a profile collects it', async ({page}) => {
   await openProfile(page, 'ada-example');
@@ -117,4 +117,24 @@ test('extraction reads English and Portuguese About panels', async ({page}) => {
   }, await (await import('node:fs/promises')).readFile(new URL('../extension/extract.js', import.meta.url), 'utf8'));
   expect(result.en).toMatchObject({created: 'May 2013', age: '~162 months', contact: 'January 2025', verification: 'Identity: Verified by LinkedIn in April 2026; Workplace: Verified with a work email'});
   expect(result.pt).toMatchObject({created: 'maio de 2024', age: '~30 months', verification: 'Nenhuma verificação'});
+});
+
+test('a newer release puts a badge on the toolbar icon and the update line first in the panel', async ({page, context, worker}) => {
+  await release(context, worker, 'v99.0.0');
+  expect(await worker.evaluate(() => chrome.action.getBadgeText({}))).toBe(' ');
+  await openProfile(page, 'ada-example');
+  await dot(page).click();
+  const first = panel(page).locator(':scope > *').first();
+  await expect(first).toHaveText('There is an update for the extension · Update now ↗');
+  await expect(first.getByRole('link', {name: 'Update now ↗'})).toHaveAttribute('href', 'https://github.com/jotafeldmann/profile-signals#install');
+});
+
+test('the installed version shows no badge and no update line', async ({page, context, worker}) => {
+  const installed = await worker.evaluate(() => chrome.runtime.getManifest().version);
+  await release(context, worker, `v${installed}`);
+  expect(await worker.evaluate(() => chrome.action.getBadgeText({}))).toBe('');
+  await openProfile(page, 'ada-example');
+  await dot(page).click();
+  await expect(panel(page)).toBeVisible();
+  await expect(panel(page).locator('.update')).toHaveCount(0);
 });

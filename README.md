@@ -10,7 +10,8 @@
 
 A Chrome extension that reads what LinkedIn already shows about a member profile (account creation date,
 verifications, connections) and rates it green, yellow or red with rules you set. No account, no AI, no
-server: everything runs and stays in your browser.
+server: everything runs and stays in your browser (the only request is a daily check for a new version on
+GitHub).
 
 **The colors are signals to look closer, not proof.** A new account does not make a profile fake, and a
 green one may still be fake. Do not use them alone for hiring or any other decision about a person.
@@ -23,8 +24,10 @@ green one may still be fake. Do not use them alone for hiring or any other decis
    `profile-signals` folder (the one with `manifest.json`).
 3. Pin the extension from the puzzle icon, then open or reload a LinkedIn profile.
 
-To update, replace the folder's files, click reload on the extension in `chrome://extensions`, then reload
-LinkedIn.
+**Updating.** When a new version is out, a red badge appears on the extension's icon and the panel opens
+with *There is an update for the extension · Update now*. Download the new zip from the
+[latest release](https://github.com/jotafeldmann/profile-signals/releases/latest), replace the folder's files
+with it, click reload on the extension in `chrome://extensions`, then reload LinkedIn.
 
 ## Use
 
