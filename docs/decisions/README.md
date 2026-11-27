@@ -15,5 +15,6 @@ ADR with status `rejected` and its reason.
 | [ADR-008](ADR-008-public-repository-and-releases.md) | accepted | public repository under MIT; releases are GitHub releases built from tags | 2026-11-26 |
 | [ADR-009](ADR-009-automatic-collection-by-default.md) | accepted | collection is automatic by default; manual is a setting | 2026-11-26 |
 | [ADR-010](ADR-010-update-notice.md) | accepted | a newer release is announced, not installed | 2026-11-27 |
+| [ADR-011](ADR-011-share-settings-with-a-team.md) | accepted | teams share settings as a file or text; only what decides the color travels | 2026-11-27 |
 
-By status: 9 accepted, 1 superseded.
+By status: 10 accepted, 1 superseded.

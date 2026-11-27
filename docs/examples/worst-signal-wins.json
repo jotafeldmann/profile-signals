@@ -1,0 +1,43 @@
+{
+  "profileSignals": "profile-signals-settings",
+  "format": 1,
+  "exportedFrom": "0.5.0",
+  "verdict": {
+    "greenAtLeast": 0.8,
+    "yellowAtLeast": 0.5
+  },
+  "rules": [
+    {
+      "id": "account-age",
+      "label": "Account age (months)",
+      "field": "age",
+      "type": "number",
+      "weight": 1,
+      "hardGate": true,
+      "greenAtLeast": 24,
+      "redBelow": 12,
+      "_comment": "Red under 12 months, yellow from 12 to 23, green from 24 months."
+    },
+    {
+      "id": "connections",
+      "label": "Connections",
+      "field": "connections",
+      "type": "number",
+      "weight": 1,
+      "hardGate": true,
+      "greenAtLeast": 201,
+      "redBelow": 100,
+      "_comment": "Red under 100, yellow from 100 to 200, green above 200. 500+ counts as 500."
+    },
+    {
+      "id": "verification",
+      "label": "Verifications",
+      "field": "verification",
+      "type": "present",
+      "weight": 1,
+      "hardGate": true,
+      "ifMissing": "red",
+      "_comment": "Red when LinkedIn shows no verification. Many genuine members never verify."
+    }
+  ]
+}

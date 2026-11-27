@@ -1,4 +1,6 @@
 // The installed extension, end to end, on synthetic profile pages. Run with: make test-e2e
+import {readFileSync} from 'node:fs';
+import {resolve} from 'node:path';
 import {automatic, configure, counts, dot, expect, manual, openProfile, panel, release, test} from './fixtures.ts';
 
 test('by default, opening a profile collects it', async ({page}) => {
@@ -137,4 +139,43 @@ test('the installed version shows no badge and no update line', async ({page, co
   await dot(page).click();
   await expect(panel(page)).toBeVisible();
   await expect(panel(page).locator('.update')).toHaveCount(0);
+});
+
+test('settings are shared as a file and loaded by a teammate, to review and save', async ({page, worker, extensionId}) => {
+  await page.goto(`chrome-extension://${extensionId}/options.html`);
+  await page.getByRole('button', {name: 'Share my settings'}).click();
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', {name: 'Download file'}).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toBe('profile-signals-config.json');
+  const shared = JSON.parse(readFileSync((await file.path())!, 'utf8'));
+  expect(shared).toMatchObject({profileSignals: 'profile-signals-settings', format: 1});
+  expect(shared).not.toHaveProperty('collection');
+
+  // Unsaved changes are not shared.
+  await page.locator('#yellowAt').fill('40');
+  await expect(page.getByRole('button', {name: 'Download file'})).toBeDisabled();
+  await expect(page.locator('#shareNote')).toHaveText('Save your changes first: sharing sends your saved settings.');
+
+  await page.getByRole('button', {name: "Load a teammate's settings"}).click();
+  await page.locator('#loadFile').setInputFiles(resolve(import.meta.dirname, '..', 'docs', 'examples', 'worst-signal-wins.json'));
+  await expect(page.locator('#status')).toHaveText('Loaded. Review the settings below and click Save to use them.');
+  await expect(page.locator('#rules .rule')).toHaveCount(3);
+  await expect(page.locator('#yellowAt')).toHaveValue('50');
+  expect(await worker.evaluate(async () => (await chrome.storage.local.get('config')).config)).toBeUndefined();
+
+  await page.getByRole('button', {name: 'Save'}).click();
+  const saved = await worker.evaluate(async () => (await chrome.storage.local.get('config')).config);
+  expect(saved.rules.map((r: {id: string}) => r.id)).toEqual(['account-age', 'connections', 'verification']);
+  expect(saved.collection.automatic).toBe(true);
+});
+
+test('pasted text that is not settings is refused and changes nothing', async ({page, extensionId}) => {
+  await page.goto(`chrome-extension://${extensionId}/options.html`);
+  await page.getByRole('button', {name: "Load a teammate's settings"}).click();
+  await page.locator('#loadText').fill('hello team');
+  await page.getByRole('button', {name: 'Load the pasted text'}).click();
+  await expect(page.locator('#status')).toHaveText('This is not a settings file: the text is not valid JSON.');
+  await expect(page.locator('#rules .rule')).toHaveCount(3);
+  await expect(page.locator('#rules .rule').first()).toContainText('Account created');
 });

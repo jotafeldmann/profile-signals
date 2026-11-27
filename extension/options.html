@@ -30,12 +30,38 @@
   #status{color:var(--muted)} #status.error{color:var(--red)} #status.ok{color:var(--green)}
   .scale{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
   .dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .box{border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:12px;background:#f8fafd}
+  .box p{margin:0 0 10px} .box textarea{min-height:110px}
 </style>
 </head>
 <body>
 <main>
   <h1>Profile Signals settings</h1>
   <p class="lead">These rules decide the color of the dot next to a LinkedIn profile name. Saving applies them at once to open LinkedIn tabs. The defaults come from <code>rules.json</code>.</p>
+
+  <section id="share">
+    <h2>Share with your team</h2>
+    <p class="help">Use the same rules as your team: share yours, or load a teammate's. Only what decides the color travels: the verdict and the rules, with their weights and hard gates. Collection and cache stay as each person set them.</p>
+    <div class="actions">
+      <button id="shareOpen" type="button">Share my settings</button>
+      <button id="loadOpen" type="button">Load a teammate's settings</button>
+    </div>
+    <div id="shareBox" class="box" hidden>
+      <p>Send this file, or the copied text, to your team. They open <b>Settings → Load a teammate's settings</b> and choose the file or paste the text.</p>
+      <div class="actions">
+        <button id="shareDownload" class="primary" type="button">Download file</button>
+        <button id="shareCopy" type="button">Copy text</button>
+      </div>
+      <p id="shareNote" class="help"></p>
+    </div>
+    <div id="loadBox" class="box" hidden>
+      <p>Choose the file you received, or paste the text. You can review the settings before saving them.</p>
+      <label>Settings file<input id="loadFile" type="file" accept=".json,application/json"></label>
+      <label style="margin-top:12px">Or paste the text<textarea id="loadText" spellcheck="false"></textarea></label>
+      <div class="actions"><button id="loadApply" type="button">Load the pasted text</button></div>
+    </div>
+  </section>
 
   <section>
     <h2>Verdict</h2>
@@ -85,6 +111,7 @@
   </div>
   <p class="help">Made by <a href="https://github.com/jotafeldmann" target="_blank" rel="noopener noreferrer">github.com/jotafeldmann</a></p>
 </main>
+<script src="share.js"></script>
 <script src="options.js"></script>
 </body>
 </html>

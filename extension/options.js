@@ -5,7 +5,7 @@ const TYPES = {
   number: [['greenAtLeast', 'Green from (count)'], ['redBelow', 'Red below (count)']],
   present: []
 };
-let defaults, config;
+let defaults, config, dirty = false;
 
 function el(tag, props = {}, ...children) {
   const e = document.createElement(tag);
@@ -14,7 +14,7 @@ function el(tag, props = {}, ...children) {
   return e;
 }
 function status(text, kind = '') { const s = $('#status'); s.textContent = text; s.className = kind; }
-function changed() { $('#json').value = JSON.stringify(config, null, 2); status('Unsaved changes'); }
+function changed() { $('#json').value = JSON.stringify(config, null, 2); dirty = true; shareState(); status('Unsaved changes'); }
 const num = v => (v === '' ? undefined : Number(v));
 
 function ruleCard(rule, i) {
@@ -61,23 +61,7 @@ function render() {
   $('#json').value = JSON.stringify(config, null, 2);
 }
 
-// Returns a list of problems; empty means the settings can be saved.
-function problems(c) {
-  const out = [];
-  if (!Array.isArray(c?.rules)) return ['"rules" must be a list'];
-  const g = c.verdict?.greenAtLeast, y = c.verdict?.yellowAtLeast;
-  if (!(g >= 0 && g <= 1 && y >= 0 && y <= 1)) out.push('Verdict thresholds must be between 0% and 100%');
-  else if (y > g) out.push('Yellow must start at or below green');
-  if (c.cache?.enabled !== false && !(c.cache?.days >= 1)) out.push('Cache days must be at least 1');
-  for (const r of c.rules) {
-    const name = r.label || r.id || 'a rule';
-    if (!TYPES[r.type]) out.push(`${name}: unknown type "${r.type}"`);
-    if (!(r.weight >= 0)) out.push(`${name}: weight must be 0 or more`);
-    if (r.type === 'year' && r.greenBefore > r.redAfter + 1) out.push(`${name}: "green before" must not be later than "red after" + 1`);
-    if (r.type === 'number' && r.redBelow > r.greenAtLeast) out.push(`${name}: "red below" must not be above "green from"`);
-  }
-  return out;
-}
+const S = globalThis.ProfileSignalsShare, problems = S.problems;
 
 async function countCache() {
   const all = await chrome.storage.local.get(null);
@@ -102,13 +86,43 @@ $('#save').onclick = async () => {
   const p = problems(config);
   if (p.length) return status(p.join('. '), 'error');
   await chrome.storage.local.set({config});
+  dirty = false; shareState();
   status('Saved. Open LinkedIn tabs use it now.', 'ok');
 };
 $('#reset').onclick = async () => {
   if (!confirm('Discard your settings and go back to rules.json?')) return;
   await chrome.storage.local.remove('config');
-  config = structuredClone(defaults); render(); status('Back to the defaults in rules.json.', 'ok');
+  config = structuredClone(defaults); render(); dirty = false; shareState(); status('Back to the defaults in rules.json.', 'ok');
 };
+// Share with your team (ADR-011): the saved verdict and rules as a file or text, and a teammate's loaded
+// into the form, to review and save.
+const VERSION = chrome.runtime.getManifest().version;
+function shareState() {
+  $('#shareDownload').disabled = $('#shareCopy').disabled = dirty;
+  $('#shareNote').textContent = dirty ? 'Save your changes first: sharing sends your saved settings.' : '';
+}
+function toggle(open, closed) { $(open).hidden = !$(open).hidden; $(closed).hidden = true; }
+$('#shareOpen').onclick = () => toggle('#shareBox', '#loadBox');
+$('#loadOpen').onclick = () => toggle('#loadBox', '#shareBox');
+$('#shareDownload').onclick = () => {
+  const url = URL.createObjectURL(new Blob([S.text(config, VERSION)], {type: 'application/json'}));
+  const a = el('a', {href: url, download: S.FILE}); document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  status(`Downloaded ${S.FILE}. Send it to your team.`, 'ok');
+};
+$('#shareCopy').onclick = async () => {
+  try { await navigator.clipboard.writeText(S.text(config, VERSION)); status('Copied. Paste it in a message to your team.', 'ok'); }
+  catch { status('Copy did not work here: use Download file.', 'error'); }
+};
+function load(raw) {
+  const r = S.importSettings(raw, config);
+  if (r.error) return status(r.error, 'error');
+  config = r.config; render(); changed(); $('#loadBox').hidden = true; $('#loadText').value = ''; $('#loadFile').value = '';
+  status('Loaded. Review the settings below and click Save to use them.', 'ok');
+}
+$('#loadFile').onchange = async e => { const f = e.target.files?.[0]; if (f) load(await f.text()); };
+$('#loadApply').onclick = () => load($('#loadText').value);
+
 $('#clearCache').onclick = async () => {
   const keys = Object.keys(await chrome.storage.local.get(null)).filter(k => k.startsWith('profile:'));
   if (!confirm(`Delete ${keys.length} cached profile${keys.length === 1 ? '' : 's'}? They will be collected again on the next visit.`)) return;
@@ -120,5 +134,5 @@ $('#clearCache').onclick = async () => {
   defaults = await (await fetch('rules.json')).json();
   const {config: saved} = await chrome.storage.local.get('config');
   config = structuredClone(saved || defaults);
-  render(); countCache(); status(saved ? 'Using your saved settings.' : 'Using the defaults from rules.json.');
+  render(); countCache(); shareState(); status(saved ? 'Using your saved settings.' : 'Using the defaults from rules.json.');
 })();

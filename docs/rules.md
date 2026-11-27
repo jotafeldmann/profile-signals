@@ -34,7 +34,26 @@ then the connections rule is left out of the score.
 | `number`  | the first number in the field | `greenAtLeast`, `redBelow`                 |
 | `present` | whether the field has text   | `ifMissing`: the color when nothing is shown |
 
-Fields: `created`, `connections`, `followers`, `mutual`, `degree`, `photo`, `contact`, `verification`.
+Fields: `created`, `age` (months since `created`, as `~30 months`), `connections`, `followers`, `mutual`,
+`degree`, `photo`, `contact`, `verification`.
+
+## Share with your team
+
+**Share my settings** in the settings tab downloads `profile-signals-config.json`, or copies the same text,
+with your saved verdict and rules. A teammate opens **Load a teammate's settings**, picks the file or pastes the
+text, reviews the form and clicks **Save**. Collection and cache are not shared: each person keeps theirs
+(ADR-011).
+
+[`docs/examples/worst-signal-wins.json`](examples/worst-signal-wins.json) is one such file: every rule is a hard
+gate, so any red signal makes the profile red and green needs every rule green.
+
+| Rule                 | Red          | Yellow     | Green          |
+| -------------------- | ------------ | ---------- | -------------- |
+| Account age (months) | under 12     | 12 to 23   | 24 or more     |
+| Connections          | under 100    | 100 to 200 | more than 200  |
+| Verifications        | none shown   | n/a        | any shown      |
+
+Missing verification alone makes a profile red with it, and many genuine members never verify.
 
 ## Collection
 

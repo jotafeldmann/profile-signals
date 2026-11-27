@@ -39,3 +39,9 @@ test('update line at the top of the panel', async ({page, context, worker}) => {
   await dot(page).click();
   await expect(panel(page).locator('.update')).toHaveScreenshot('panel-update.png');
 });
+
+test('share with your team, open', async ({page, extensionId}) => {
+  await page.goto(`chrome-extension://${extensionId}/options.html`);
+  await page.getByRole('button', {name: 'Share my settings'}).click();
+  await expect(page.locator('#share')).toHaveScreenshot('share.png');
+});

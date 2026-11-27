@@ -14,6 +14,7 @@ Everything Chrome loads is in `extension/`, plain JavaScript with no build step 
 | `background.js`             | hands the rules to the page (saved settings, else `rules.json`), opens the settings tab, sets the update badge |
 | `update.js`                 | whether a newer release exists on GitHub: asks at most once a day, never once one is known (ADR-010) |
 | `options.html`, `options.js` | the settings tab                                                                          |
+| `share.js`                  | the shared settings file (export, import) and the checks before saving (ADR-011)          |
 | `popup.html`, `popup.js`    | the toolbar popup: the same panel for the active tab                                      |
 | `rules.json`                | the default rules                                                                          |
 

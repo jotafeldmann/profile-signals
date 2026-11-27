@@ -69,6 +69,9 @@ Everything that decides the color is a setting: **Settings** in the panel, or ri
 - **Verdict:** the score from which a profile is green (80%) or yellow (50%).
 - **Collection:** automatic on every profile (default) or only when you click.
 - **Cache:** on or off, and how many days a result is kept (90).
+- **Share with your team:** download your settings as a file, or copy them, and send them; a teammate loads
+  the file or pastes the text, reviews it and saves. Only the verdict and the rules travel. An example:
+  [worst signal wins](docs/examples/worst-signal-wins.json).
 
 The rules and their defaults, with the reasons: [rules](docs/rules.md). The profiles in these images are
 invented, as in the tests.
