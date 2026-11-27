@@ -34,7 +34,8 @@ LinkedIn's fixed top bar unless the panel is open. A click outside the panel, or
 5. The dialog opens empty and is filled about half a second later: poll until the creation date, photo or
    contact line appears (up to 4 s), read it, close the dialog.
 
-The dot is a blue ring that fills through these steps. By default all of them run on arrival. In manual mode, step 1 runs on arrival and steps 2–5
+The dot is a blue ring that fills through these steps and pulses while it works (still, if the system asks
+for reduced motion). By default all of them run on arrival. In manual mode, step 1 runs on arrival and steps 2–5
 only on **Collect now**; a panel the person opened is read as it is.
 
 ## When LinkedIn changes

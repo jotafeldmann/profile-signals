@@ -46,6 +46,6 @@ Fields: `created`, `connections`, `followers`, `mutual`, `degree`, `photo`, `con
 ## Cache
 
 Each collected profile is kept for 90 days, keyed by its URL (`/in/<slug>`), so revisiting it shows the result
-at once and opens nothing. A cached result shows a small ring on the dot and the panel says when it was
+at once and opens nothing. A cached result shows 🕘 on the dot and the panel says when it was
 collected. **Refresh now** collects again. The settings tab changes the days, turns the cache off, or clears
 it. Only profiles whose creation date was read are cached.

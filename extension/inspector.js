@@ -19,9 +19,11 @@
   .dot{position:relative;display:flex;align-items:center;justify-content:center;border:0;padding:3px;background:transparent;border-radius:50%}
   .dot:focus-visible{outline:2px solid #0a66c2;outline-offset:1px}
   .circle{position:relative;width:14px;height:14px;border-radius:50%;display:block;background:var(--c)}
-  .circle.loading{background:conic-gradient(var(--c) calc(var(--p) * 1%),#d8dce1 0)}
+  .circle.loading{background:conic-gradient(var(--c) calc(var(--p) * 1%),#d8dce1 0);animation:ps-pulse 1.2s ease-out infinite}
+  @keyframes ps-pulse{0%{box-shadow:0 0 0 0 rgba(10,102,194,.45)}100%{box-shadow:0 0 0 6px rgba(10,102,194,0)}}
+  @media (prefers-reduced-motion:reduce){.circle.loading{animation:none}}
   .circle.loading::after{content:'';position:absolute;inset:3px;border-radius:50%;background:#fff}
-  .cachemark{position:absolute;right:0;bottom:0;width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid #202124}
+  .cachemark{position:absolute;right:-4px;bottom:-4px;font-size:10px;line-height:1;pointer-events:none}
   .cache{background:#f3f6f8;border-radius:6px;padding:6px 8px}
   .floating{position:absolute;top:100%;left:0;margin-top:4px}
   .progress{height:6px;background:#eceff1;border-radius:3px;overflow:hidden;margin:8px 0 4px}
@@ -36,20 +38,20 @@
   const loading=state=>state?.status==='loading'&&state?.progress;
   // Share of the work done: halfway through the current step, never 100% until finished.
   function percent(state){const p=state?.progress;return p?Math.round(100*(p.step-0.5)/p.total):0;}
-  function cacheText(state){const d=new Date(state.collectedAt);const days=Math.floor((Date.now()-state.collectedAt)/864e5);return `From cache, collected ${d.toLocaleDateString()} (${days===0?'today':days===1?'1 day ago':days+' days ago'}). Refresh collects again.`;}
+  function cacheText(state){const d=new Date(state.collectedAt);const days=Math.floor((Date.now()-state.collectedAt)/864e5);return `🕘 From cache, collected ${d.toLocaleDateString()} (${days===0?'today':days===1?'1 day ago':days+' days ago'}). Refresh collects again.`;}
   function summary(state){
     const p=loading(state);if(p)return `Collecting: step ${p.step} of ${p.total}, ${p.label}`;
     if(state?.status==='error')return 'Collection failed';
     if(state?.status==='idle')return 'Not collected yet: click to collect';
     const v=state?.verdict;return v?.color?`${NAMES[v.color]}: ${v.reason}`:'No verdict: '+(state?.rulesError||v?.reason||'rules not loaded');
   }
-  // The status dot: a blue ring that fills while collecting, then the verdict color.
+  // The status dot: a blue ring that fills and pulses while collecting, then the verdict color; 🕘 when cached.
   function dot(state){
     const p=loading(state);
     const b=el('button',null,'dot');b.type='button';b.title=summary(state);b.setAttribute('aria-label','Profile Signals: '+b.title);
     const c=el('span',null,p?'circle loading':'circle');
     c.style.setProperty('--c',p?COLORS.blue:COLORS[state?.verdict?.color]||COLORS.grey);if(p)c.style.setProperty('--p',String(percent(state)));
-    b.append(c);if(state?.fromCache&&!p){b.append(el('span',null,'cachemark'));b.title='[cached] '+b.title;b.setAttribute('aria-label','Profile Signals: '+b.title);}return b;
+    b.append(c);if(state?.fromCache&&!p){const m=el('span','🕘','cachemark');m.setAttribute('aria-hidden','true');b.append(m);b.title='[cached] '+b.title;b.setAttribute('aria-label','Profile Signals: '+b.title);}return b;
   }
   function render(state,{refresh,settings,close}={}){
     const p=el('section',null,'panel');p.append(el('h2','Profile Signals'));
