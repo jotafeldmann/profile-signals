@@ -49,7 +49,8 @@
     if (m < 0) return '';
     const n = (now.getFullYear() - Number(y[1])) * 12 + now.getMonth() - m;
     if (n < 0) return '';
-    return n === 0 ? 'This month' : `~${n} month${n === 1 ? '' : 's'}`;
+    // Always a number, so a rule on the account age can read it: "This month" left a new account unchecked.
+    return `~${n} month${n === 1 ? '' : 's'}`;
   }
 
   function extractAbout(d, now = new Date()) {
