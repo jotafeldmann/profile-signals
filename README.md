@@ -2,24 +2,18 @@
 
 [![ci](https://github.com/jotafeldmann/profile-signals/actions/workflows/ci.yml/badge.svg)](https://github.com/jotafeldmann/profile-signals/actions/workflows/ci.yml)
 
+<p>
+  <img src="docs/images/preview-green.png" width="250" alt="A green dot next to a profile name, with the panel open: every rule passes">
+  <img src="docs/images/preview-yellow.png" width="250" alt="A yellow verdict: the account was created between 2016 and 2022">
+  <img src="docs/images/preview-red.png" width="250" alt="A red verdict: the account was created after 2022, with no verifications and few connections">
+</p>
+
 A Chrome extension that reads what LinkedIn already shows about a member profile (account creation date,
 verifications, connections) and rates it green, yellow or red with rules you set. No account, no AI, no
 server: everything runs and stays in your browser.
 
 **The colors are signals to look closer, not proof.** A new account does not make a profile fake, and a
 green one may still be fake. Do not use them alone for hiring or any other decision about a person.
-
-## Preview
-
-<p>
-  <img src="docs/images/preview-green.png" width="270" alt="A green dot next to a profile name, with the panel open: every rule passes">
-  <img src="docs/images/preview-yellow.png" width="270" alt="A yellow verdict: the account was created between 2016 and 2022">
-  <img src="docs/images/preview-red.png" width="270" alt="A red verdict: the account was created after 2022, with no verifications and few connections">
-</p>
-
-The profiles above are invented, as in the tests. The settings tab:
-
-<img src="docs/images/settings.png" width="600" alt="The settings tab: verdict thresholds, automatic collection, rules and cache">
 
 ## Install
 
@@ -63,6 +57,8 @@ Everything that decides the color is a setting: **Settings** in the panel, or ri
 **Options**. Saved settings apply at once to open LinkedIn tabs, and **Reset to defaults** goes back to
 [`rules.json`](extension/rules.json).
 
+<img src="docs/images/settings.png" width="600" alt="The settings tab: verdict thresholds, automatic collection, rules and cache">
+
 - **Hard gates:** turn any rule into a gate, or stop it being one. A red gate makes the profile red, a yellow
   gate caps it at yellow. By default only **Account created** is a gate.
 - **Rules:** turn each one on or off, reorder them (the order is the priority), set its weight and its
@@ -71,7 +67,8 @@ Everything that decides the color is a setting: **Settings** in the panel, or ri
 - **Collection:** automatic on every profile (default) or only when you click.
 - **Cache:** on or off, and how many days a result is kept (90).
 
-The rules and their defaults, with the reasons: [rules](docs/rules.md).
+The rules and their defaults, with the reasons: [rules](docs/rules.md). The profiles in these images are
+invented, as in the tests.
 
 ## Docs
 
