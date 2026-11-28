@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Profile Signals",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Reads what LinkedIn shows about a member profile and rates it locally with your own rules.",
   "permissions": ["activeTab", "storage"],
   "action": {
