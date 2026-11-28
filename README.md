@@ -16,6 +16,11 @@ GitHub).
 **The colors are signals to look closer, not proof.** A new account does not make a profile fake, and a
 green one may still be fake. Do not use them alone for hiring or any other decision about a person.
 
+> [!WARNING]
+> **Known issue:** on **your own** profile, detection works only some of the time
+> ([#1](https://github.com/jotafeldmann/profile-signals/issues/1)). To try the extension, browse other
+> people's profiles.
+
 ## Install
 
 1. Download `profile-signals-<version>.zip` from the
