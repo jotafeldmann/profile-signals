@@ -38,7 +38,7 @@
   function judge() { state.verdict = rules ? V.evaluate(rules, state.data) : null; state.rulesError = rulesError; }
   function updateStatus() { state.status = 'done'; judge(); }
   const STEPS = ['Reading the profile card', 'Waiting for LinkedIn to finish loading', 'Opening the More menu', 'Opening About this member', 'Reading the About panel'];
-  function progress(i) { state.progress = {step: i + 1, total: STEPS.length, label: STEPS[i]}; draw(); }
+  function progress(i, label = STEPS[i]) { state.progress = {step: i + 1, total: STEPS.length, label}; draw(); }
   // Manual mode: nothing is opened until the person asks. The network line of the card is read, but no
   // verdict is shown before the About panel was read, since the account date is the hard gate.
   function idle() {
@@ -84,6 +84,12 @@
   }
   function removeHost() { host?.remove(); host = null; opened = false; state = {status: 'loading', data: {}}; }
 
+  // LinkedIn's single-page app reports the page as loaded long before the profile answers clicks. So collection
+  // waits for the profile itself (the More button and the network line), lets it settle a second, then tries
+  // to open About this member, pausing longer after each miss: about half a minute in all (ADR-012).
+  const SETTLE = 1000, PAUSES = [1000, 2000, 4000, 8000];
+  const ready = () => { const n = extractNetwork(); return findMenu() && (n.connections || n.followers); };
+
   async function collect(force = false) {
     if (!profile() || busy || !heading()) return;
     busy = true; const token = generation; const valid = () => token === generation && profile() && route === current();
@@ -93,13 +99,16 @@
     let menu = null, autoDialog = null, d = aboutDialog();
     try {
       if (!d && !dialogs().length) {
-        // LinkedIn ignores clicks made before its scripts finish starting the page, so wait, then retry.
         progress(1); await until(() => document.readyState === 'complete', 8000, valid);
-        for (let attempt = 1; attempt <= 3 && !d && valid(); attempt++) {
+        await until(ready, 8000, valid); await until(() => false, SETTLE, valid);
+        merge(extractNetwork());
+        for (let attempt = 0; attempt <= PAUSES.length && !d && valid(); attempt++) {
+          if (attempt) { progress(1, `Waiting for LinkedIn, try ${attempt + 1} of ${PAUSES.length + 1}`); await until(aboutDialog, PAUSES[attempt - 1], valid); }
+          d = aboutDialog(); if (d || !valid()) break; // the person may have opened it meanwhile
           progress(2); menu = findMenu(); let item = findItem();
           if (!item && menu) { if (menu.getAttribute('aria-expanded') !== 'true') menu.click(); item = await until(findItem, 700, valid); }
           if (item && valid()) { progress(3); item.click(); d = autoDialog = await until(aboutDialog, 2500, valid); }
-          if (!d && valid()) { if (menu?.getAttribute('aria-expanded') === 'true') menu.click(); await wait(300); }
+          if (!d && valid() && menu?.getAttribute('aria-expanded') === 'true') menu.click();
         }
       }
       if (!valid()) return;
@@ -112,8 +121,11 @@
       }
       merge(extractNetwork());
       state.progress = null; updateStatus(); saveCache();
-      state.note = state.data.created ? 'Unavailable fields were not detected.'
-        : 'Open More → About this member manually; the extension will read the visible panel. Diagnostic: ' + (menu ? 'menu found' : 'menu not found') + '; ' + (d ? 'dialog found' : 'dialog not found') + '.';
+      const diagnostic = 'Diagnostic: ' + (menu ? 'menu found' : 'menu not found') + '; ' + (d ? 'dialog found' : 'dialog not found') + '.';
+      // Not reaching the About panel says nothing about the person, so it is grey, not a yellow verdict.
+      if (!d) { state.status = 'unread'; state.note = 'LinkedIn did not open About this member in time. Try again, or open More → About this member yourself; the extension reads the visible panel. ' + diagnostic; }
+      else state.note = state.data.created ? 'Unavailable fields were not detected.'
+        : 'Open More → About this member manually; the extension will read the visible panel. ' + diagnostic;
       if (autoDialog && valid()) {
         const close = [...autoDialog.querySelectorAll('button')].find(b => /^(?:dismiss|close|done|fechar|dispensar|concluído)$/i.test(clean(b.getAttribute('aria-label') || b.getAttribute('title') || b.innerText)));
         if (close) close.click();
@@ -141,13 +153,15 @@
       if (automatic()) collect(); else idle();
     } else {
       const previous = JSON.stringify(state.data); merge(extractNetwork());
-      if (previous !== JSON.stringify(state.data) && state.status === 'done') { judge(); draw(); }
+      if (previous !== JSON.stringify(state.data) && (state.status === 'done' || state.status === 'unread')) { judge(); draw(); }
     }
   }
 
   // Close the panel on a click anywhere outside it, or on Esc.
   document.addEventListener('pointerdown', e => { if (opened && host && !e.composedPath().includes(host)) { opened = false; draw(); } }, true);
   document.addEventListener('keydown', e => { if (opened && e.key === 'Escape') { opened = false; draw(); } });
+  // A profile that could not be read is tried once more when the person comes back to its tab.
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && state.status === 'unread' && automatic()) collect(); });
   addEventListener('resize', place); addEventListener('scroll', place, {passive: true});
   chrome.runtime.onMessage.addListener((msg, _sender, respond) => {
     if (msg.type === 'profile-signals:get') respond(profile() ? state : {status: 'partial', data: {}, note: 'Open a LinkedIn member profile first.'});

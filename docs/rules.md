@@ -9,7 +9,8 @@ apply at once to open LinkedIn tabs; **Reset to defaults** returns to the file.
   the weighted average of the rules that could be checked. By default 80% or more is green, 50% or more is
   yellow, anything lower is red. A field LinkedIn did not show is left out of the score.
 - **Hard gate** lets one rule decide on its own: a red gate makes the profile red, a yellow gate caps it at
-  yellow, and a gate that could not be checked also caps it at yellow.
+  yellow, and a gate that could not be checked also caps it at yellow. That is when the About panel was read without
+  the field; when the panel could not be opened at all, there is no verdict: the dot is a grey **?** (ADR-012).
 
 ## Defaults
 

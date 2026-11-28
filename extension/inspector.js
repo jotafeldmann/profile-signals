@@ -23,6 +23,7 @@
   @keyframes ps-pulse{0%{box-shadow:0 0 0 0 rgba(10,102,194,.45)}100%{box-shadow:0 0 0 6px rgba(10,102,194,0)}}
   @media (prefers-reduced-motion:reduce){.circle.loading{animation:none}}
   .circle.loading::after{content:'';position:absolute;inset:3px;border-radius:50%;background:#fff}
+  .circle.unread::after{content:'?';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font:700 10px/1 Arial,sans-serif}
   .cachemark{position:absolute;right:-4px;bottom:-4px;font-size:10px;line-height:1;pointer-events:none}
   .cache{background:#f3f6f8;border-radius:6px;padding:6px 8px}
   .floating{position:absolute;top:100%;left:0;margin-top:4px}
@@ -44,14 +45,16 @@
     const p=loading(state);if(p)return `Collecting: step ${p.step} of ${p.total}, ${p.label}`;
     if(state?.status==='error')return 'Collection failed';
     if(state?.status==='idle')return 'Not collected yet: click to collect';
+    if(state?.status==='unread')return 'Could not read this profile: click to try again';
     const v=state?.verdict;return v?.color?`${NAMES[v.color]}: ${v.reason}`:'No verdict: '+(state?.rulesError||v?.reason||'rules not loaded');
   }
-  // The status dot: a blue ring that fills and pulses while collecting, then the verdict color; 🕘 when cached.
+  // The status dot: a blue ring that fills and pulses while collecting, then the verdict color; 🕘 when cached,
+  // a grey ? when LinkedIn never opened the About panel (ADR-012).
   function dot(state){
     const p=loading(state);
     const b=el('button',null,'dot');b.type='button';b.title=summary(state);b.setAttribute('aria-label','Profile Signals: '+b.title);
-    const c=el('span',null,p?'circle loading':'circle');
-    c.style.setProperty('--c',p?COLORS.blue:COLORS[state?.verdict?.color]||COLORS.grey);if(p)c.style.setProperty('--p',String(percent(state)));
+    const c=el('span',null,p?'circle loading':state?.status==='unread'?'circle unread':'circle');
+    const unread=state?.status==='unread';c.style.setProperty('--c',p?COLORS.blue:!unread&&COLORS[state?.verdict?.color]||COLORS.grey);if(p)c.style.setProperty('--p',String(percent(state)));
     b.append(c);if(state?.fromCache&&!p){const m=el('span','🕘','cachemark');m.setAttribute('aria-hidden','true');b.append(m);b.title='[cached] '+b.title;b.setAttribute('aria-label','Profile Signals: '+b.title);}return b;
   }
   // The update line is the first thing in the panel, while a newer release exists (ADR-010).
@@ -61,19 +64,20 @@
     const step=loading(state);const v=state?.verdict;
     if(step){const bar=el('div',null,'progress');const fill=el('span');fill.style.width=percent(state)+'%';bar.append(fill);p.append(bar);p.append(el('p',`Step ${step.step} of ${step.total}: ${step.label}…`));}
     else if(state?.status==='idle'){const line=el('div',null,'verdict');line.append(mini(null),el('span','Not collected yet'));p.append(line);}
+    else if(state?.status==='unread'){const line=el('div',null,'verdict');line.append(mini(null),el('span','Could not read this profile'));p.append(line);}
     else{const line=el('div',null,'verdict');line.append(mini(v?.color),el('span',v?.color?NAMES[v.color]:'No verdict'),el('small',v?.color?v.reason:(state?.rulesError||v?.reason||'')));p.append(line);}
     if(state?.name)p.append(el('p',state.name));
     if(state?.fromCache&&!step)p.append(el('p',cacheText(state),'cache'));
-    if(!step&&v?.results?.length){
+    if(!step&&state?.status!=='unread'&&v?.results?.length){
       p.append(el('h3','Rules'));const dl=el('dl');
       for(const r of v.results){const row=el('div',null,'line');const dt=el('dt');dt.append(mini(r.color),el('span',r.label));if(r.hardGate)dt.append(el('span','gate','gate'));row.append(dt,el('dd',r.reason));dl.append(row);}
       p.append(dl);
     }
     p.append(el('h3','Collected'));
-    const dl=el('dl');for(const [key,label] of fields){const row=el('div',null,'line');row.append(el('dt',label),el('dd',state?.data?.[key]||(step?'…':state?.status==='idle'?'Not read yet':'Unavailable')));dl.append(row);}p.append(dl);
+    const dl=el('dl');for(const [key,label] of fields){const row=el('div',null,'line');row.append(el('dt',label),el('dd',state?.data?.[key]||(step?'…':state?.status==='idle'||state?.status==='unread'?'Not read yet':'Unavailable')));dl.append(row);}p.append(dl);
     if(state?.note)p.append(el('p',state.note));
     p.append(el('p','Colors follow your rules (Settings). They are signals to look closer, not proof that a profile is fake or genuine.'));
-    const a=el('div',null,'actions');if(refresh){const b=el('button',state?.status==='idle'?'Collect now':state?.fromCache?'Refresh now':'Refresh');b.onclick=refresh;b.disabled=!!step;a.append(b);}if(settings){const b=el('button','Settings');b.onclick=settings;a.append(b);}if(close){const b=el('button','Close');b.onclick=close;a.append(b);}p.append(a);p.append(credit());return p;
+    const a=el('div',null,'actions');if(refresh){const b=el('button',state?.status==='idle'?'Collect now':state?.status==='unread'?'Try again':state?.fromCache?'Refresh now':'Refresh');b.onclick=refresh;b.disabled=!!step;a.append(b);}if(settings){const b=el('button','Settings');b.onclick=settings;a.append(b);}if(close){const b=el('button','Close');b.onclick=close;a.append(b);}p.append(a);p.append(credit());return p;
   }
   globalThis.ProfileSignalsUI={el,style,render,dot};
 })();

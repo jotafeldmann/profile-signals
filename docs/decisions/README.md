@@ -16,5 +16,6 @@ ADR with status `rejected` and its reason.
 | [ADR-009](ADR-009-automatic-collection-by-default.md) | accepted | collection is automatic by default; manual is a setting | 2026-11-26 |
 | [ADR-010](ADR-010-update-notice.md) | accepted | a newer release is announced, not installed | 2026-11-27 |
 | [ADR-011](ADR-011-share-settings-with-a-team.md) | accepted | teams share settings as a file or text; only what decides the color travels | 2026-11-27 |
+| [ADR-012](ADR-012-wait-for-linkedin-and-grey-when-unread.md) | accepted | wait for the profile, retry for about half a minute, and show a grey ? when it could not be read | 2026-11-27 |
 
-By status: 10 accepted, 1 superseded.
+By status: 11 accepted, 1 superseded.

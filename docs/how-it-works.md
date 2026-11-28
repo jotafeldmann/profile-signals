@@ -30,14 +30,18 @@ LinkedIn's fixed top bar unless the panel is open. A click outside the panel, or
 ## Collection steps
 
 1. Read the network line of the top card (connections, followers, mutual, degree).
-2. Wait for `document.readyState === "complete"`: LinkedIn ignores clicks made before its scripts start.
-3. Open **More** (`aria-label` "More actions" and variants), up to three attempts.
+2. Wait for the profile, not only the page (ADR-012): `document.readyState === "complete"`, then the **More**
+   button and the network line in the top card (up to 8 s), then one second to settle. LinkedIn reports the
+   page loaded well before the profile answers clicks.
+3. Open **More** (`aria-label` "More actions" and variants). Five tries, with pauses of 1, 2, 4 and 8 s
+   between them; the dot reads "Waiting for LinkedIn, try N of 5" meanwhile.
 4. Click **About this member**, wait up to 2.5 s for the dialog.
 5. The dialog opens empty and is filled about half a second later: poll until the creation date, photo or
    contact line appears (up to 4 s), read it, close the dialog.
 
 The dot is a blue ring that fills through these steps and pulses while it works (still, if the system asks
-for reduced motion). By default all of them run on arrival. In manual mode, step 1 runs on arrival and steps 2–5
+for reduced motion). If the About panel never opened, the dot is a grey **?** with **Try again**: no verdict,
+nothing cached, and one more try when the person returns to the tab. By default all of them run on arrival. In manual mode, step 1 runs on arrival and steps 2–5
 only on **Collect now**; a panel the person opened is read as it is.
 
 ## When LinkedIn changes

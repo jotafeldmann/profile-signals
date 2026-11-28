@@ -45,16 +45,22 @@
     'mid-example': {name: 'Mid Example', headline: 'Analyst at Example Co.', network: '3rd · 500+ connections', about: ['Joined', 'March 2020', ...VERIFIED]},
     'new-account': {name: 'Nova Account', headline: 'Recruiter', network: '3rd · 12 connections', about: ['Joined', 'February 2023', 'No verifications']},
     // Ignores clicks for longer, like a slow LinkedIn start: the extension has to retry.
-    'slow-start': {name: 'Slow Start', headline: 'Designer', network: '2nd · 250 connections', hydrateMs: 1500, about: ['Joined', 'June 2011', ...VERIFIED]}
+    'slow-start': {name: 'Slow Start', headline: 'Designer', network: '2nd · 250 connections', hydrateMs: 1500, about: ['Joined', 'June 2011', ...VERIFIED]},
+    // A cold start: the network line shows up after 3 s and clicks count only after 7 s, longer than a few quick tries.
+    'cold-start': {name: 'Cold Start', headline: 'Developer', network: '2nd · 320 connections', networkMs: 3000, hydrateMs: 7000, about: ['Joined', 'August 2012', ...VERIFIED]},
+    // Never answers clicks by itself (hydrateMs null): the test decides when it does, through __fixture.hydrated.
+    'never-ready': {name: 'Never Ready', headline: 'Writer', network: '2nd · 410 connections', hydrateMs: null, about: ['Joined', 'January 2010', ...VERIFIED]}
   };
   const p = PROFILES[location.pathname.split('/')[2]] || PROFILES['ada-example'];
   const $ = id => document.getElementById(id);
   document.title = `${p.name} | LinkedIn`;
-  $('name').textContent = p.name; $('headline').textContent = p.headline; $('network').textContent = p.network;
+  $('name').textContent = p.name; $('headline').textContent = p.headline;
+  const showNetwork = () => { $('network').textContent = p.network; };
+  if (p.networkMs) setTimeout(showNetwork, p.networkMs); else showNetwork();
 
   // What the tests read back: how many times the menu and the panel were opened, and when clicks start to count.
   window.__fixture = {menuOpened: 0, aboutOpened: 0, hydrated: false};
-  setTimeout(() => { window.__fixture.hydrated = true; }, p.hydrateMs ?? 400);
+  if (p.hydrateMs !== null) setTimeout(() => { window.__fixture.hydrated = true; }, p.hydrateMs ?? 400);
   const ready = () => window.__fixture.hydrated;
   const setMenu = open => { $('menu').hidden = !open; $('more').setAttribute('aria-expanded', String(open)); };
 

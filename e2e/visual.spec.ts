@@ -26,6 +26,16 @@ test('dot next to the name', async ({page, worker}) => {
   await expect(page.locator('#card')).toHaveScreenshot('card-red.png');
 });
 
+test('panel when LinkedIn never opened About this member', async ({page, worker}) => {
+  test.slow();
+  await configure(worker, automatic);
+  await openProfile(page, 'never-ready');
+  await expect(dot(page)).toHaveAttribute('aria-label', /Could not read this profile/, {timeout: 40_000});
+  await expect(page.locator('#card')).toHaveScreenshot('card-unread.png');
+  await dot(page).click();
+  await expect(panel(page)).toHaveScreenshot('panel-unread.png');
+});
+
 test('settings tab', async ({page, extensionId}) => {
   await page.goto(`chrome-extension://${extensionId}/options.html`);
   await expect(page.locator('#cacheCount')).toHaveText('0 profiles cached.');

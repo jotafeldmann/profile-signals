@@ -3,9 +3,10 @@ import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {automatic, configure, counts, dot, expect, manual, openProfile, panel, release, test} from './fixtures.ts';
 
-test('by default, opening a profile collects it', async ({page}) => {
+test('by default, opening a profile collects it, in a few seconds', async ({page}) => {
   await openProfile(page, 'ada-example');
-  await expect(dot(page)).toHaveAttribute('aria-label', /Green/, {timeout: 10_000});
+  // The wait for the profile to settle adds about a second, not the half minute of a slow start.
+  await expect(dot(page)).toHaveAttribute('aria-label', /Green/, {timeout: 5_000});
   expect((await counts(page)).aboutOpened).toBe(1);
 });
 
@@ -47,6 +48,31 @@ test('automatic collection rates each profile by the rules', async ({page, worke
 test('automatic collection retries when the page ignores early clicks', async ({page, worker}) => {
   await configure(worker, automatic);
   await openProfile(page, 'slow-start');
+  await expect(dot(page)).toHaveAttribute('aria-label', /Green/, {timeout: 15_000});
+});
+
+test('a cold start is waited for: green without reloading the page', async ({page, worker}) => {
+  await configure(worker, automatic);
+  await openProfile(page, 'cold-start');
+  await expect(dot(page)).toHaveAttribute('aria-label', /Collecting/);
+  await expect(dot(page)).toHaveAttribute('aria-label', /Green/, {timeout: 20_000});
+  expect((await counts(page)).aboutOpened).toBe(1);
+});
+
+test('when LinkedIn never answers, the dot is a grey ?, and Try again reads it', async ({page, worker}) => {
+  test.slow();
+  await configure(worker, automatic);
+  await openProfile(page, 'never-ready');
+  await expect(dot(page)).toHaveAttribute('aria-label', /Waiting for LinkedIn, try 2 of 5/, {timeout: 10_000});
+  await expect(dot(page)).toHaveAttribute('aria-label', /Could not read this profile/, {timeout: 40_000});
+  await expect(dot(page).locator('.circle.unread')).toBeVisible();
+  await dot(page).click();
+  await expect(panel(page)).toContainText('Could not read this profile');
+  await expect(panel(page)).not.toContainText(/Yellow|Hard gate not checked/);
+  await expect(panel(page)).toContainText('410'); // the network line is still read
+
+  await page.evaluate(() => { (window as unknown as {__fixture: {hydrated: boolean}}).__fixture.hydrated = true; });
+  await panel(page).getByRole('button', {name: 'Try again'}).click();
   await expect(dot(page)).toHaveAttribute('aria-label', /Green/, {timeout: 15_000});
 });
 

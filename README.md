@@ -38,6 +38,8 @@ with it, click reload on the extension in `chrome://extensions`, then reload Lin
   collect automatically (on by default: see [privacy and limits](docs/privacy.md)). Turned off, the dot stays
   grey until you click it and choose **Collect now**, or open the About panel yourself.
 - 🕘 on the dot means the result came from the cache; **Refresh now** collects again.
+- A grey **?** means LinkedIn did not open the About panel in time (it is given about half a minute):
+  **Try again**, or open **More → About this member** yourself.
 
 ## Develop
 

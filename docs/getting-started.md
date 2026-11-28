@@ -38,7 +38,7 @@ mode**, **Load unpacked**. After changing a file, click reload on the extension 
 | Command            | What it covers                                                                          | Time  |
 | ------------------ | --------------------------------------------------------------------------------------- | ----- |
 | `make test`        | the scoring rules, one version everywhere, the package holds exactly what ships        | <1 s  |
-| `make test-e2e`    | the installed extension in Chromium: manual and automatic collection, retries, cache, panel, settings tab, English and Portuguese panels | ~20 s |
+| `make test-e2e`    | the installed extension in Chromium: manual and automatic collection, slow and cold starts, the grey ?, cache, panel, settings tab, English and Portuguese panels | ~1 min |
 | `make test-visual` | screenshots of the panel, the dot and the settings tab, in Playwright's Docker image   | ~30 s |
 | `make ci`          | lint, typecheck and all of the above: what CI runs                                     |       |
 
